@@ -29,18 +29,24 @@ class SymbolCodeProduct extends Command
     public function handle()
     {
         try{
-            $result = Category::query()->where('id', '=', $this->argument('id'))->firstOrFail()->products;  
+            $result1 = Category::query()->where('id', '=', $this->argument('id'))->get();
+            if(count($result1)==0){
+                throw new ModelNotFoundException('this id does not exist');
+            }
+            foreach($result1 as $temp){
+                $result=$temp->products;
+                if(count($result)==0){
+                    $this->info('this category has zero products');
+                }
+                foreach($result as $temp_obj){
+                    $this->info('symbol_code = '. $temp_obj['symbol_code']);
+                }
+            }
         }
         catch(ModelNotFoundException $e)
         {
             echo $e->getMessage();
         }
-        if(count($result)==0){
-            throw new ModelNotFoundException('this category has zero products');
-        }
-        foreach($result as $temp_obj)
-            $this->info('symbol_code = '. $temp_obj['symbol_code']);
-            
-            
+         
     }
 }
